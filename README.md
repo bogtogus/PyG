@@ -1,2 +1,4 @@
 # PyG
-PyG
+
+<br>
+GPL 3
