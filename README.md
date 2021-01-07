@@ -1,4 +1,6 @@
 # PyG
 
-<br>
-GPL 3
+## Ресурсы
+human.png взят из игры PixelDungeon(watabou)
+## Лицензия
+_PyFuhrLicense_
