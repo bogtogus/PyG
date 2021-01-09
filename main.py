@@ -1,6 +1,7 @@
 # Подключение библиотек
 import pygame, time, random, datetime
 from math import cos, sin, pi
+
 # define
 fps = 60
 KeyPressed = []
@@ -25,18 +26,19 @@ class Map:
         for j in range(len(self.map)):
             for i in range(len(self.map[j])):
                 if self.map[j][i] == 1:
-                    screen.blit(self.wall, (640+i*32-MainHero.x, 310+j*32-MainHero.y))
+                    screen.blit(self.wall, (640 + i * 32 - MainHero.x, 310 + j * 32 - MainHero.y))
                 if self.map[j][i] == 0:
-                    screen.blit(self.plintus, (640+i*32-MainHero.x, 310+j*32-MainHero.y))
+                    screen.blit(self.plintus, (640 + i * 32 - MainHero.x, 310 + j * 32 - MainHero.y))
 
     def check(self, x, y: int):
-        if self.map[(y - 15) // 32][(x - 15) // 32] == 0 and self.map[(y - 15) // 32][(x + 15) // 32] == 0 and\
-            self.map[(y + 15) // 32][(x - 15) // 32] == 0 and self.map[(y + 15) // 32][(x + 15) // 32] == 0:
+        if self.map[(y - 15) // 32][(x - 15) // 32] == 0 and self.map[(y - 15) // 32][(x + 15) // 32] == 0 and \
+                self.map[(y + 15) // 32][(x - 15) // 32] == 0 and self.map[(y + 15) // 32][(x + 15) // 32] == 0:
             return True
         return False
 
 
 class Hero:
+    __doc__ = 'pass'
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -44,10 +46,16 @@ class Hero:
         self.image.set_colorkey(self.image.get_at((0, 0)))
         self.pow = 0
         self.flipped = False
+        self.stamina = 100
 
-    def draw(self, x=-1, y=-1):
-        if x == -1 and y == -1:
-            screen.blit(self.image, (640 - 16, 310 - 16))
+    def draw(self):
+        screen.blit(self.image, (640 - 16, 310 - 16))
+        if self.stamina < 100:
+            pygame.draw.line(screen, 'red', (660, 326), (660, 326 - (self.stamina // 30)), width=3)
+        elif self.stamina < 400:
+            pygame.draw.line(screen, 'yellow', (660, 326), (660, 326 - (self.stamina // 30)), width=3)
+        elif self.stamina != 1000:
+            pygame.draw.line(screen, 'white', (660, 326), (660, 326 - (self.stamina // 30)), width=3)
 
     def punch(self, pov):
         R = 32
@@ -57,7 +65,7 @@ class Hero:
         y2 = y1
         for i in range(0, 100):
             rad = (i + pov) * pi / 180
-            pygame.draw.line(screen, (50+i, 50+i, 50+i), (640, 310), (x2, y2), width=1)
+            pygame.draw.line(screen, (50 + i, 50 + i, 50 + i), (640, 310), (x2, y2), width=1)
             pygame.draw.line(screen, 'white', (x1, y1), (x2, y2), width=1)
             x2 = x1
             y2 = y1
@@ -77,7 +85,7 @@ class Hero:
             for i in range(0, 100):
                 rad = (i + pov) * pi / 180
                 if random.randint(0, 3) == 1:
-                    pygame.draw.line(screen, (255, 255-(R-20)*6, 0), (x1, y1), (x2, y2), width=1)
+                    pygame.draw.line(screen, (255, 255 - (R - 20) * 6, 0), (x1, y1), (x2, y2), width=1)
                 x2 = x1
                 y2 = y1
                 x1 = round(R * cos(rad)) + 640
@@ -85,12 +93,16 @@ class Hero:
             pygame.display.flip()
 
 
+debug_kmin = 1000000  # fps_draw
+
 if __name__ == '__main__':
+    cursor = []
+    cursori = pygame.image.load('data/cursor.png')
     with open('maps/level1.map') as data:
         level1 = Map([list(map(int, i.split())) for i in data.readlines()])
-
     pygame.init()
     pygame.display.set_caption('PyG')
+    pygame.mouse.set_visible(False)
     run_image = pygame.image.load('data/main_run.png')
     screen = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)
     font = pygame.font.Font(None, 30)
@@ -104,6 +116,8 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 MainLoop = False
+            if event.type == pygame.MOUSEMOTION:
+                cursor = event.pos
             if event.type == pygame.KEYDOWN:
                 KeyPressed.append(event.key)
             if event.type == pygame.KEYUP:
@@ -139,38 +153,50 @@ if __name__ == '__main__':
                     MainHero.flipped = False
 
             if pygame.K_SPACE in KeyPressed:
-                hud()
-                if MainHero.pow == 0:
-                    MainHero.x += 105
-                if MainHero.pow == 1:
-                    MainHero.y += 105
-                if MainHero.pow == 2:
-                    MainHero.x -= 105
-                if MainHero.pow == 3:
-                    MainHero.y -= 105
-                hud()
-                tempx = 640
-                tempy = 310
-                for i in range(1, 15):
+                if MainHero.stamina > 300 and MainHero.x - 137 > 0 and MainHero.y - 137 > 0 and\
+                        MainHero.y + 137 < len(level1.map) * 32 and MainHero.x + 137 < len(level1.map[0]) * 32: # Надо пофиксить ссылку на длину карту на константу
+                    MainHero.stamina -= 300
+                    hud()
                     if MainHero.pow == 0:
-                        tempx -= i
+                        MainHero.x += 105
                     if MainHero.pow == 1:
-                        tempy -= i
+                        MainHero.y += 105
                     if MainHero.pow == 2:
-                        tempx += i
+                        MainHero.x -= 105
                     if MainHero.pow == 3:
-                        tempy += i
-                    screen.blit(run_image, (tempx - 16, tempy - 16))
-                    flip()
-                    MainHero.draw()
-                    time.sleep(0.01)
-                MainHero.punch(MainHero.pow * 90 - 50)
+                        MainHero.y -= 105
+                    hud()
+                    tempx = 640
+                    tempy = 310
+                    for i in range(1, 15):
+                        if MainHero.pow == 0:
+                            tempx -= i
+                        if MainHero.pow == 1:
+                            tempy -= i
+                        if MainHero.pow == 2:
+                            tempx += i
+                        if MainHero.pow == 3:
+                            tempy += i
+                        screen.blit(run_image, (tempx - 16, tempy - 16))
+                        flip()
+                        MainHero.draw()
+                        time.sleep(0.01)
+                    MainHero.punch(MainHero.pow * 90 - 50)
             if pygame.K_q in KeyPressed:
                 MainHero.igni(MainHero.pow * 90 - 50)
 
+        t = datetime.datetime.now()  # fps_draw
         hud()
+
+        k = int(1000 / ((datetime.datetime.now() - t).microseconds / 1000))  # fps_draw
+        if debug_kmin > k: debug_kmin = k  # fps_draw
+        screen.blit(font.render(str(k) + ' | min: ' + str(debug_kmin), True, 'green'), (0, 0))  # fps_draw
+        screen.blit(font.render(str(MainHero.stamina), True, 'green'), (0, 32))  # fps_draw
         MainHero.draw()
+        screen.blit(cursori, cursor)
         flip()
         clock.tick(fps)
+        if MainHero.stamina < 1000:
+            MainHero.stamina += 1
 
     pygame.quit()
