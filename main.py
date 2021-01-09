@@ -46,7 +46,9 @@ class Hero:
         self.image.set_colorkey(self.image.get_at((0, 0)))
         self.pow = 0
         self.flipped = False
-        self.stamina = 100
+        self.stamina = 1000
+        self.manna = 1000
+        self.health = 1000
 
     def draw(self):
         screen.blit(self.image, (640 - 16, 310 - 16))
@@ -55,7 +57,15 @@ class Hero:
         elif self.stamina < 400:
             pygame.draw.line(screen, 'yellow', (660, 326), (660, 326 - (self.stamina // 30)), width=3)
         elif self.stamina != 1000:
-            pygame.draw.line(screen, 'white', (660, 326), (660, 326 - (self.stamina // 30)), width=3)
+            pygame.draw.line(screen, 'white', (658, 326), (658, 326 - (self.stamina // 30)), width=3)
+        if self.manna != 1000:
+            pygame.draw.line(screen, 'blue', (622, 326), (622, 326 - (self.manna // 30)), width=3)
+        if self.health < 250:
+            pygame.draw.line(screen, 'red', (624, 290), (624 + (self.health // 30), 290), width=3)
+        elif self.health < 500:
+            pygame.draw.line(screen, 'yellow', (624, 290), (624 + (self.health // 30), 290), width=3)
+        elif self.health != 1000:
+            pygame.draw.line(screen, 'green', (624, 290), (624 + (self.health // 30), 290), width=3)
 
     def punch(self, pov):
         R = 32
@@ -76,6 +86,9 @@ class Hero:
         time.sleep(0.5)
 
     def igni(self, pov):
+        if self.manna < 300:
+            return 0
+        self.manna -= 300
         for R in range(20, 60):
             x1 = 640 + int(R * cos(pov * pi / 180))
             y1 = 310 + int(R * sin(pov * pi / 180))
@@ -122,6 +135,9 @@ if __name__ == '__main__':
                 KeyPressed.append(event.key)
             if event.type == pygame.KEYUP:
                 del KeyPressed[KeyPressed.index(event.key)]
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if 620 < event.pos[0] < 660 and 290 < event.pos[1] < 330:
+                    MainHero.health -= 300
 
         if KeyPressed:
             if pygame.K_ESCAPE in KeyPressed:
@@ -153,8 +169,8 @@ if __name__ == '__main__':
                     MainHero.flipped = False
 
             if pygame.K_SPACE in KeyPressed:
-                if MainHero.stamina > 300 and MainHero.x - 137 > 0 and MainHero.y - 137 > 0 and\
-                        MainHero.y + 137 < len(level1.map) * 32 and MainHero.x + 137 < len(level1.map[0]) * 32: # Надо пофиксить ссылку на длину карту на константу
+                if MainHero.stamina > 300 and MainHero.x - 150 > 0 and MainHero.y - 150 > 0 and\
+                        MainHero.y + 150 < len(level1.map) * 32 and MainHero.x + 150 < len(level1.map[0]) * 32: # Надо пофиксить ссылку на длину карту на константу
                     MainHero.stamina -= 300
                     hud()
                     if MainHero.pow == 0:
@@ -196,7 +212,32 @@ if __name__ == '__main__':
         screen.blit(cursori, cursor)
         flip()
         clock.tick(fps)
+
+        if MainHero.health < 0:
+            MainLoop = False
+
         if MainHero.stamina < 1000:
             MainHero.stamina += 1
+        if MainHero.health < 1000:
+            MainHero.health += 1
+        if MainHero.manna < 1000:
+            MainHero.manna += 1
 
+    MainLoop = True
+    screen.fill('black')
+    font = pygame.font.Font('data/font.ttf', 128)
+    font2 = pygame.font.Font(None, 32)
+    for i in range(255):
+        screen.blit(font.render('YOU DIED', True, (i, 0, 0)), (325, 250))
+        pygame.display.flip()
+        screen.fill('black')
+        time.sleep(0.01)
+    while MainLoop:
+        screen.fill('black')
+        screen.blit(font.render('YOU DIED', True, 'red'), (325, 250))
+        screen.blit(font2.render('Нажмите любую кнопку для продолжения', True, 'red'), (425, 400))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                MainLoop = False
+        pygame.display.flip()
     pygame.quit()
