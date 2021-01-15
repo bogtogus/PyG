@@ -1,5 +1,5 @@
 # Подключение библиотек
-import pygame, time, random, datetime
+import pygame, time, random, datetime, threading
 from math import cos, sin, pi
 
 t1 = datetime.datetime.now()
@@ -7,9 +7,15 @@ t1 = datetime.datetime.now()
 def flip():
     global t1
     pygame.draw.rect(user.screen, 'black', (0, 0, 40, 20))
-    user.screen.blit(font.render(str(1000 // ((datetime.datetime.now() - t1).microseconds / 1000)), True, 'yellow'), (0, 0))
+    user.screen.blit(font.render(str(int(1000 / ((datetime.datetime.now() - t1).microseconds / 1000))), True, 'yellow'), (0, 0))
     pygame.display.flip()
     t1 = datetime.datetime.now()
+
+def hud():
+    user.screen.fill((0, 0, 0))
+    user.level.draw()
+    pygame.draw.rect(user.screen, 'white', (user.size[0] - 64, 0, 32, 96), width=1)
+    pygame.draw.rect(user.screen, 'white', (user.size[0] - 96, 32, 96, 32), width=1)
 
 
 # define
@@ -30,12 +36,8 @@ class settings:
         self.size = list(map(int, size.split('x')))
         self.level = level
         self.screen = None
+        self.AS = pygame.sprite.Group()
 
-def hud():
-    user.screen.fill((0, 0, 0))
-    level1.draw()
-    pygame.draw.rect(user.screen, 'white', (user.size[0] - 64, 0, 32, 96), width=1)
-    pygame.draw.rect(user.screen, 'white', (user.size[0] - 96, 32, 96, 32), width=1)
 
 
 class Map:
@@ -55,10 +57,14 @@ class Map:
                                                user.size[1] // 2 + j * 32 - MainHero.y))
 
     def check(self, x, y: int):
-        if self.map[(y - 15) // 32][(x - 15) // 32] == 0 and self.map[(y - 15) // 32][(x + 15) // 32] == 0 and \
-                self.map[(y + 15) // 32][(x - 15) // 32] == 0 and self.map[(y + 15) // 32][(x + 15) // 32] == 0:
-            return True
-        return False
+        try:
+
+            if self.map[(y - 16) // 32][(x - 16) // 32] == 0 and self.map[(y - 16) // 32][(x + 15) // 32] == 0 and\
+                    self.map[(y + 15) // 32][(x - 16) // 32] == 0 and self.map[(y + 15) // 32][(x + 15) // 32] == 0:
+                return True
+            return False
+        except IndexError:
+            return False
 
 
 class Hero:
@@ -75,27 +81,27 @@ class Hero:
 
     def draw(self):
         user.screen.blit(self.image, (user.size[0] // 2 - 16, user.size[1] // 2 - 16))
-        if self.stamina < 100:
+        if self.stamina < 300:
             pygame.draw.line(user.screen, 'red', (user.size[0] // 2 + 18, user.size[1] // 2 + 16),
-                             (user.size[0] // 2 + 18, user.size[1] // 2 + 16 - (self.stamina // 32)), width=3)
-        elif self.stamina < 400:
+                             (user.size[0] // 2 + 18, user.size[1] // 2 + 16 - (self.stamina // 31)), width=3)
+        elif self.stamina < 500:
             pygame.draw.line(user.screen, 'yellow', (user.size[0] // 2 + 18, user.size[1] // 2 + 16),
-                             (user.size[0] // 2 + 18, user.size[1] // 2 + 16 - (self.stamina // 32)), width=3)
+                             (user.size[0] // 2 + 18, user.size[1] // 2 + 16 - (self.stamina // 31)), width=3)
         elif self.stamina != 1000:
             pygame.draw.line(user.screen, 'white', (user.size[0] // 2 + 18, user.size[1] // 2 + 16),
-                             (user.size[0] // 2 + 18, user.size[1] // 2 + 16 - (self.stamina // 32)), width=3)
+                             (user.size[0] // 2 + 18, user.size[1] // 2 + 16 - (self.stamina // 31)), width=3)
         if self.manna != 1000:
             pygame.draw.line(user.screen, 'blue', (user.size[0] // 2 - 18, user.size[1] // 2 + 16),
-                             (user.size[0] // 2 - 18, user.size[1] // 2 + 16 - (self.manna // 30)), width=3)
+                             (user.size[0] // 2 - 18, user.size[1] // 2 + 16 - (self.manna // 31)), width=3)
         if self.health < 250:
             pygame.draw.line(user.screen, 'red', (user.size[0] // 2 - 16, user.size[1] // 2 - 18),
-                             (user.size[0] // 2 - 16 + (self.health // 30), user.size[1] // 2 - 18), width=3)
+                             (user.size[0] // 2 - 16 + (self.health // 31), user.size[1] // 2 - 18), width=3)
         elif self.health < 500:
             pygame.draw.line(user.screen, 'yellow', (user.size[0] // 2 - 16, user.size[1] // 2 - 18),
-                             (user.size[0] // 2 - 16 + (self.health // 30), user.size[1] // 2 - 18), width=3)
+                             (user.size[0] // 2 - 16 + (self.health // 31), user.size[1] // 2 - 18), width=3)
         elif self.health != 1000:
             pygame.draw.line(user.screen, 'green', (user.size[0] // 2 - 16, user.size[1] // 2 - 18),
-                             (user.size[0] // 2 - 16 + (self.health // 30), user.size[1] // 2 - 18), width=3)
+                             (user.size[0] // 2 - 16 + (self.health // 31), user.size[1] // 2 - 18), width=3)
 
     def punch(self, pov):
         R = 32
@@ -138,7 +144,34 @@ class Hero:
             flip()
 
 
-debug_kmin = 1000000  # fps_draw
+class Emeny(pygame.sprite.Sprite):
+    image = pygame.image.load('data/apple.png')
+
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = Emeny.image
+        self.image.set_colorkey('black')
+        self.rect = self.image.get_rect()
+        self.x = 400
+        self.y = 100
+        self.rect.x = user.size[0] // 2 + self.x - MainHero.x
+        self.rect.y = user.size[1] // 2 + self.y - MainHero.y
+        self.point = (random.randint(16, 704), random.randint(16, 704))
+
+    def update(self):
+        if self.x + 16 < MainHero.x and level1.check(self.x + 17, self.y + 16):
+            self.x += 1
+        if self.x + 16 > MainHero.x and level1.check(self.x + 15, self.y + 16):
+            self.x -= 1
+        if self.y + 16 < MainHero.y and level1.check(self.x + 16, self.y + 17):
+            self.y += 1
+        if self.y + 16 > MainHero.y and level1.check(self.x + 16, self.y + 15):
+            self.y -= 1
+        if (self.x < MainHero.x < self.x + 32) and (self.y < MainHero.y < self.y + 32):
+            MainHero.health -= 11
+        self.rect.x = user.size[0] // 2 + self.x - MainHero.x
+        self.rect.y = user.size[1] // 2 + self.y - MainHero.y
+
 
 if __name__ == '__main__':
 
@@ -147,7 +180,7 @@ if __name__ == '__main__':
     with open('maps/level1.map') as data:
         level1 = Map([list(map(int, i.split())) for i in data.readlines()])
     pygame.init()
-    user = settings(size='1280x720', level=level1)
+    user = settings(autosize=True, level=level1)
     pygame.display.set_caption('PyG')
     pygame.mouse.set_visible(False)
     run_image = pygame.image.load('data/main_run.png')
@@ -158,7 +191,7 @@ if __name__ == '__main__':
 
     MainHero = Hero(64, 64)
     MainHero.image.convert_alpha()
-
+    Emeny(user.AS)
     while MainLoop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -189,7 +222,7 @@ if __name__ == '__main__':
         if user.KeyPressed:
             if pygame.K_ESCAPE in user.KeyPressed:
                 pygame.quit()
-                exit('ESC')
+                exit('Exit -> 02')
             if pygame.K_w in user.KeyPressed:
                 MainHero.pow = 3
                 if level1.check(MainHero.x, MainHero.y - 2):
@@ -217,34 +250,43 @@ if __name__ == '__main__':
                     MainHero.flipped = False
 
             if pygame.K_SPACE in user.KeyPressed:
-                if MainHero.stamina > 300 and MainHero.x - 150 > 0 and MainHero.y - 150 > 0 and\
-                        MainHero.y + 150 < len(level1.map) * 32 and MainHero.x + 150 < len(user.level.map[0]) * 32: # Надо пофиксить ссылку на длину карту на константу
-                    MainHero.stamina -= 300
                     hud()
-                    if MainHero.pow == 0:
-                        MainHero.x += 105
-                    if MainHero.pow == 1:
-                        MainHero.y += 105
-                    if MainHero.pow == 2:
-                        MainHero.x -= 105
-                    if MainHero.pow == 3:
-                        MainHero.y -= 105
+                    CanJump = True
+                    if MainHero.pow == 0 and MainHero.x < len(user.level.map[0]) * 32 - 144 and\
+                            level1.check(MainHero.x + 128, MainHero.y) and MainHero.stamina > 300:
+                        MainHero.stamina -= 300
+                        MainHero.x += 128
+                    elif MainHero.pow == 1 and MainHero.y < len(user.level.map) * 32 - 144 and\
+                            level1.check(MainHero.x, MainHero.y + 128) and MainHero.stamina > 300:
+                        MainHero.stamina -= 300
+                        MainHero.y += 128
+                    elif MainHero.pow == 2 and MainHero.x > 144 and\
+                            level1.check(MainHero.x - 128, MainHero.y) and MainHero.stamina > 300:
+                        MainHero.stamina -= 300
+                        MainHero.x -= 128
+                    elif MainHero.pow == 3 and MainHero.y > 144 and\
+                            level1.check(MainHero.x, MainHero.y - 128) and MainHero.stamina > 300:
+                        MainHero.stamina -= 300
+                        MainHero.y -= 128
+                    else:
+                        CanJump = False
                     hud()
-                    tempx = user.size[0] // 2
-                    tempy = user.size[1] // 2
-                    for i in range(1, 15):
-                        if MainHero.pow == 0:
-                            tempx -= i
-                        if MainHero.pow == 1:
-                            tempy -= i
-                        if MainHero.pow == 2:
-                            tempx += i
-                        if MainHero.pow == 3:
-                            tempy += i
-                        user.screen.blit(run_image, (tempx - 16, tempy - 16))
-                        flip()
-                        MainHero.draw()
-                        time.sleep(0.01)
+                    if CanJump:
+                        tempx = user.size[0] // 2
+                        tempy = user.size[1] // 2
+                        for i in range(1, 15):
+                            if MainHero.pow == 0:
+                                tempx -= i
+                            if MainHero.pow == 1:
+                                tempy -= i
+                            if MainHero.pow == 2:
+                                tempx += i
+                            if MainHero.pow == 3:
+                                tempy += i
+                            user.screen.blit(run_image, (tempx - 16, tempy - 16))
+                            flip()
+                            MainHero.draw()
+                            time.sleep(0.01)
 
             if pygame.K_q in user.KeyPressed:
                 MainHero.igni(MainHero.pow * 90 - 50)
@@ -252,6 +294,8 @@ if __name__ == '__main__':
         t = datetime.datetime.now()  # fps_draw
         hud()
         MainHero.draw()
+        user.AS.update()
+        user.AS.draw(user.screen)
         user.screen.blit(cursori, cursor)
         flip()
         clock.tick(user.fps)
@@ -282,3 +326,4 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 MainLoop = False
     pygame.quit()
+    exit('Exit -> 01')

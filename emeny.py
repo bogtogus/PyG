@@ -36,8 +36,10 @@ class Emeny(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = Emeny.image
         self.rect = self.image.get_rect()
-        self.rect.x = 346
-        self.rect.y = 346
+        self.x = 346
+        self.y = 346
+        self.rect.x = user.size[0] // 2 - self.x
+        self.rect.x = user.size[0] // 2 - self.y
         self.point = (random.randint(16, 704), random.randint(16, 704))
     def update(self):
         if self.rect.x + 16 < self.point[0]:
@@ -49,8 +51,8 @@ class Emeny(pygame.sprite.Sprite):
         if self.rect.y + 16 > self.point[1]:
             self.rect = self.rect.move(0, -1)
         pygame.draw.circle(screen, 'white', self.point, 3)
-        if self.rect.x + 16 == self.point[0] and self.rect.y + 16 == self.point[1]:
-            self.point = (random.randint(16, 704), random.randint(16, 704))
+        if self.rect.x < MainHero.x < self.rect.x + 32 and self.rect.y < MainHero.x < self.rect.y + 32:
+
 
 
 pygame.init()
