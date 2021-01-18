@@ -1,4 +1,3 @@
-# Подключение библиотек
 import pygame, time, random, datetime
 from math import cos, sin, pi
 import invertory, emeny, items
