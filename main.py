@@ -39,11 +39,11 @@ class settings:
 class Map:
     def __init__(self, map: list):
         self.map = map
-        self.wall = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/wall.png')
-        self.grass = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/grass.png')
-        self.barrier = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/barrier.png')
-        self.portal = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/portal.png')
-        self.stone = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/stone.png')
+        self.wall = pygame.image.load('data/wall.png')
+        self.grass = pygame.image.load('data/grass.png')
+        self.barrier = pygame.image.load('data/barrier.png')
+        self.portal = pygame.image.load('data/portal.png')
+        self.stone = pygame.image.load('data/stone.png')
         self.stone.set_colorkey(-1)
 
     def draw(self):
@@ -82,7 +82,7 @@ class Hero:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.image = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/main.png')
+        self.image = pygame.image.load('data/main.png')
         self.image.set_colorkey((0, 0, 0))
         self.pow = 0
         self.flipped = False
@@ -169,13 +169,13 @@ class Hero:
 
 if __name__ == '__main__':
     cursor = []
-    cursori = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/cursor.png')
+    cursori = pygame.image.load('data/cursor.png')
     pygame.init()
     with open('maps/level1.map') as data:
         user = settings(autosize=1, level=Map([list(map(int, i.split())) for i in data.readlines()]))
     pygame.display.set_caption('PyG')
     pygame.mouse.set_visible(False)
-    run_image = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/main_run.png')
+    run_image = pygame.image.load('data/main_run.png')
     user.screen = pygame.display.set_mode(user.size, pygame.FULLSCREEN)
     font = pygame.font.Font(None, 30)
     MainLoop = True
@@ -317,7 +317,7 @@ if __name__ == '__main__':
             MainHero.manna += 1
 
     MainLoop = False
-    font = pygame.font.Font('C:/Users/MISA/Pictures/Pixel Studio/data/font.ttf', user.size[1] // 4)
+    font = pygame.font.Font('data/font.ttf', user.size[1] // 4)
     font2 = pygame.font.Font(None, 32)
     for i in range(255):
         text = font.render('YOU DIED', True, (i, 0, 0))
