@@ -1,7 +1,7 @@
 import pygame
 
 class weapon:
-    __image = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/sword.png')
+    __image = pygame.image.load('data/sword.png')
 
     def __init__(self, damage):
         self.damage = damage

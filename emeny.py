@@ -2,8 +2,8 @@ import pygame, random, ctypes
 
 
 class Emeny(pygame.sprite.Sprite):
-    image = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/slime.png')
-    image2 = pygame.image.load('C:/Users/MISA/Pictures/Pixel Studio/data/slime2.png')
+    image = pygame.image.load('data/slime.png')
+    image2 = pygame.image.load('data/slime2.png')
 
     def __init__(self, x, y:int, size:list, *group):
         super().__init__(*group)
