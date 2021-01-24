@@ -4,6 +4,7 @@ import invertory, emeny, items
 
 t1 = datetime.datetime.now()
 
+addk = 0
 
 # смена кадров и счёт fps
 def flip():
@@ -38,18 +39,24 @@ class settings:
 
     def load_guys(self, path):
         self.AS = pygame.sprite.Group()
-        self.S = []
         with open('maps/level1.guys', 'r') as data:
             data2 = [i.replace('\n', '') for i in data.readlines()]
             MainHero.x = int(data2[0].split()[0])
             MainHero.y = int(data2[0].split()[1])
             for i in data2[1:]:
                 if i.split()[0] == 'Slime':
-                    user.S.append(emeny.Slime(int(i.split()[1]), int(i.split()[2]), user.size, user.AS))
-            print(len(user.S))
+                    self.S.append(emeny.Slime(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
+            print(len(self.S))
 
-
-
+    def add(self, sth, todo=0):
+        if todo == 0:
+            self.S.append(sth)
+        elif todo == 1:
+            for i in range(len(self.S)):
+                if id(self.S[i]) == id(sth):
+                    self.AS.remove(self.S[i])
+                    del self.S[i]
+                    break
 # класс карты
 class Map:
     def __init__(self, map: list):
@@ -194,18 +201,18 @@ class Hero:
                     del user.S[i - k]
                     k += 1
 
-user = settings()
+pygame.init()
+with open('maps/level1.map') as data:
+    user = settings(autosize=1, level=Map([list(map(int, i.split())) for i in data.readlines()]))
 
 if __name__ == '__main__':
 
     # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')
-    pygame.init()
-    with open('maps/level1.map') as data:
-        user = settings(autosize=1, level=Map([list(map(int, i.split())) for i in data.readlines()]))
-    pygame.display.set_caption('PyG')
 
+
+    pygame.display.set_caption('PyG')
 
     pygame.mouse.set_visible(False)
     run_image = pygame.image.load('data/main_run.png')
@@ -332,16 +339,11 @@ if __name__ == '__main__':
                     if ret[1] == 1:
                         MainHero.equip[0] = MainHero.back[ret[0] - 1]
 
-
-        for i in user.S:
-            if i.health <= 0:
-                del i
-
         # отрисовка всякой всячены(иницализированой в одном из прошлых комментариев)
         hud()
         MainHero.draw()
         health = [MainHero.health]
-        user.AS.update(MainHero.x, MainHero.y, user.size, user.level.check, health)
+        user.AS.update(MainHero.x, MainHero.y, user.size, user.level.check, user.add, health)
         MainHero.health = health[0]
         health = None
         user.AS.draw(user.screen)
