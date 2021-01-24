@@ -4,6 +4,8 @@ import invertory, emeny, items
 
 t1 = datetime.datetime.now()
 
+
+# смена кадров и счёт fps
 def flip():
     global t1
     pygame.draw.rect(user.screen, 'black', (0, 0, 40, 20))
@@ -14,13 +16,14 @@ def flip():
     pygame.display.flip()
     t1 = datetime.datetime.now()
 
+# отрисовка кода
 def hud():
     user.screen.fill((0, 0, 0))
     user.level.draw()
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 64, 0, 32, 96), width=1)
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 96, 32, 96, 32), width=1)
 
-
+# управляющий класс
 class settings:
     def __init__(self, fps=60, size='1280x720', level=None, autosize=False):
         self.fps = fps
@@ -33,15 +36,30 @@ class settings:
         self.AS = pygame.sprite.Group()
         self.S = []
 
+    def load_guys(self, path):
+        self.AS = pygame.sprite.Group()
+        self.S = []
+        with open('maps/level1.guys', 'r') as data:
+            data2 = [i.replace('\n', '') for i in data.readlines()]
+            MainHero.x = int(data2[0].split()[0])
+            MainHero.y = int(data2[0].split()[1])
+            for i in data2[1:]:
+                if i.split()[0] == 'Slime':
+                    user.S.append(emeny.Slime(int(i.split()[1]), int(i.split()[2]), user.size, user.AS))
+            print(len(user.S))
 
 
+
+# класс карты
 class Map:
     def __init__(self, map: list):
         self.map = map
         self.wall = pygame.image.load('data/wall.png')
         self.grass = pygame.image.load('data/grass.png')
         self.barrier = pygame.image.load('data/barrier.png')
+        self.barrierh = pygame.image.load('data/barrierh.png')
         self.portal = pygame.image.load('data/portal.png')
+        self.bar = pygame.image.load('data/bar.png')
         self.stone = pygame.image.load('data/stone.png')
         self.stone.set_colorkey(-1)
 
@@ -53,20 +71,27 @@ class Map:
                 if self.map[j][i] == 0:
                     user.screen.blit(self.grass, (user.size[0] // 2 + i * 32 - MainHero.x,
                                             user.size[1] // 2 + j * 32 - MainHero.y))
-                if self.map[j][i] == 1:
+                elif self.map[j][i] == 1:
                     user.screen.blit(self.wall, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                user.size[1] // 2 + j * 32 - MainHero.y))
-                if self.map[j][i] == 2:
+                elif self.map[j][i] == 2:
                     user.screen.blit(self.stone, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                  user.size[1] // 2 + j * 32 - MainHero.y))
-                if self.map[j][i] == 3:
+                elif self.map[j][i] == 3:
                     user.screen.blit(self.barrier, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                  user.size[1] // 2 + j * 32 - MainHero.y))
-                if self.map[j][i] == 4:
+                elif self.map[j][i] == 4:
+                    user.screen.blit(self.barrierh, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 5:
+                    user.screen.blit(self.bar, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+
+                elif self.map[j][i] == 6:
                     user.screen.blit(self.portal, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                  user.size[1] // 2 + j * 32 - MainHero.y))
 
-
+    # функция проверки не вошёл ли объект (x, y (32x32px)) в текстуру
     def check(self, x, y: int):
         try:
             if self.map[(y - 16) // 32][(x - 16) // 32] == 0 and self.map[(y - 16) // 32][(x + 15) // 32] == 0 and\
@@ -76,11 +101,11 @@ class Map:
         except IndexError:
             return False
 
-
+# класс главного героя
 class Hero:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self):
+        self.x = 100
+        self.y = 100
         self.image = pygame.image.load('data/main.png')
         self.image.set_colorkey((0, 0, 0))
         self.pow = 0
@@ -91,6 +116,7 @@ class Hero:
         self.back = invertory.inv()
         self.equip = [0 for i in range(5)]
 
+    # функция отрисовки героя и его параметров(health, stamina, manna)
     def draw(self):
         user.screen.blit(self.image, (user.size[0] // 2 - 16, user.size[1] // 2 - 16))
         if self.stamina < 300:
@@ -118,7 +144,9 @@ class Hero:
         if self.equip[0] != 0:
             self.equip[0].DrawEquip(user.screen, user.size)
 
+    # функция отрисовки удара и просчёт нанесения урона по Emeny
     def punch(self, pov):
+        # отрисовка удара
         R = 32
         x1 = user.size[0] // 2 + int(R * cos(pov * pi / 180))
         y1 = user.size[1] // 2 + int(R * sin(pov * pi / 180))
@@ -137,7 +165,7 @@ class Hero:
                 self.draw()
                 flip()
                 time.sleep(0.01)
-
+        # просчет удара по Emeny
         pov = (pov + 50) // 90
         k = 0
         for i in range(len(user.S)):
@@ -166,25 +194,31 @@ class Hero:
                     del user.S[i - k]
                     k += 1
 
+user = settings()
+
 if __name__ == '__main__':
+
+    # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')
     pygame.init()
     with open('maps/level1.map') as data:
         user = settings(autosize=1, level=Map([list(map(int, i.split())) for i in data.readlines()]))
     pygame.display.set_caption('PyG')
+
+
     pygame.mouse.set_visible(False)
     run_image = pygame.image.load('data/main_run.png')
     user.screen = pygame.display.set_mode(user.size, pygame.FULLSCREEN)
     font = pygame.font.Font(None, 30)
     MainLoop = True
     clock = pygame.time.Clock()
-    MainHero = Hero(256, 192)
+    MainHero = Hero()
     MainHero.image.convert_alpha()
     MainHero.back.append(items.weapon(10))
 
-    for i in range(100):
-        user.S.append(emeny.Emeny(MainHero.x, MainHero.y, user.size, user.AS))
+    # создание Emeny
+    user.load_guys('maps/level1.guys')
 
     while MainLoop:
         for event in pygame.event.get():
@@ -195,7 +229,10 @@ if __name__ == '__main__':
             if event.type == pygame.KEYDOWN:
                 user.KeyPressed.append(event.key)
             if event.type == pygame.KEYUP:
-                del user.KeyPressed[user.KeyPressed.index(event.key)]
+                try:
+                    del user.KeyPressed[user.KeyPressed.index(event.key)]
+                except:
+                    pass
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if user.size[0] // 2 - 20 < event.pos[0] < user.size[0] // 2 + 20 and\
                         user.size[1] // 2 - 20 < event.pos[1] < user.size[1] // 2 + 20:
@@ -213,6 +250,8 @@ if __name__ == '__main__':
                     else:
                         MainHero.pow = 0
                         MainHero.punch(MainHero.pow * 90 - 50)
+
+        # обработка нажатий
         if user.KeyPressed:
             if pygame.K_ESCAPE in user.KeyPressed:
                 pygame.quit()
@@ -294,6 +333,11 @@ if __name__ == '__main__':
                         MainHero.equip[0] = MainHero.back[ret[0] - 1]
 
 
+        for i in user.S:
+            if i.health <= 0:
+                del i
+
+        # отрисовка всякой всячены(иницализированой в одном из прошлых комментариев)
         hud()
         MainHero.draw()
         health = [MainHero.health]
@@ -315,6 +359,8 @@ if __name__ == '__main__':
         if MainHero.manna < 1000:
             MainHero.manna += 1
 
+
+    # YOU DIED
     MainLoop = False
     font = pygame.font.Font('data/font.ttf', user.size[1] // 4)
     font2 = pygame.font.Font(None, 32)
@@ -322,7 +368,7 @@ if __name__ == '__main__':
         text = font.render('YOU DIED', True, (i, 0, 0))
         text_rect = text.get_rect(center=(user.size[0] // 2, user.size[1] / 2))
         user.screen.blit(text, text_rect)
-        flip()
+        pygame.display.flip()
         time.sleep(0.01)
     while MainLoop:
         for event in pygame.event.get():
