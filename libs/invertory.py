@@ -1,4 +1,6 @@
 import pygame
+
+
 class inv(list):
     def __init__(self):
         super(inv, self).__init__()
@@ -6,19 +8,19 @@ class inv(list):
     def append(self, __object) -> None:
         if len(self) < 32:
             super(inv, self).append(__object)
-            return 0
+            return None
         else:
-            return -1
+            return None
 
-    def extend(self, __iterable) -> None:
-        if len(self) + len(__iterable) < 32:
-            super(inv, self).extend(__iterable)
-            return 0
+    def extend(self, iterable) -> None:
+        if len(self) + len(iterable) < 32:
+            super(inv, self).extend(iterable)
+            return None
         else:
-            return -1
+            return None
 
 
-def draw(SCREEN:pygame.surface, back: inv, x, y):
+def draw(SCREEN: pygame.surface, back: inv, x, y):
     pygame.draw.rect(SCREEN, (255, 255, 255), (0 + x, 0 + y, 265, 133), width=1)
     pygame.draw.rect(SCREEN, (255, 255, 255), (0 + x, 33 + y, 265, 67), width=1)
     pygame.draw.line(SCREEN, (255, 255, 255), (0 + x, 66 + y), (264 + x, 66 + y))
@@ -51,7 +53,6 @@ if __name__ == '__main__':
     print(pygame.display.Info().current_w, pygame.display.Info().current_h)
     screen = pygame.display.set_mode((720, 720), pygame.FULLSCREEN)
     b = inv()
-    b.extend((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12 ,12 ,12 ,12, 87,8787,78,78, 65, 45, 4, 4, 1, 5))
+    b.extend((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 12, 12, 12, 87, 8787, 78, 78, 65, 45, 4, 4, 1, 5))
     print(draw(screen, b, 128, 64))
     clock = pygame.time.Clock()
-

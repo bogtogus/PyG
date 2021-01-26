@@ -1,13 +1,17 @@
-import pygame, main
+import pygame
 from random import randint
 
-def next(x1, y1, x2, y2: int, step=3):
+
+def next_step(x1, y1, x2, y2: int, step=3):
+    c = 0
     dx = x2 - x1
     dy = y2 - y1
     sign_x = 1 if dx > 0 else -1 if dx < 0 else 0
     sign_y = 1 if dy > 0 else -1 if dy < 0 else 0
-    if dx < 0: dx = -dx
-    if dy < 0: dy = -dy
+    if dx < 0:
+        dx = -dx
+    if dy < 0:
+        dy = -dy
     if dx > dy:
         pdx, pdy = sign_x, 0
         es, el = dy, dx
@@ -19,9 +23,9 @@ def next(x1, y1, x2, y2: int, step=3):
     for i in range(step):
         error -= es
         if error < 0:
-                error += el
-                x += sign_x
-                y += sign_y
+            error += el
+            x += sign_x
+            y += sign_y
         else:
             x += pdx
             y += pdy
@@ -29,48 +33,10 @@ def next(x1, y1, x2, y2: int, step=3):
         c = (x, y)
     return c
 
-class Emeny(pygame.sprite.Sprite):
-    image = pygame.image.load('data/slime.png')
-    image2 = pygame.image.load('data/slime2.png')
-
-    def __init__(self, x, y: int, size: list, *group):
-        super().__init__(*group)
-        self.x = x
-        self.y = y
-        self.image = Emeny.image
-        self.sprite = 0
-        self.rect = self.image.get_rect()
-        self.rect.x = size[0] // 2 + self.x - x
-        self.rect.y = size[1] // 2 + self.y - y
-        self.health = 10
-
-    def update(self, x, y, size, check, health):
-        if abs(self.x - x) + abs(self.y - y) < 250:
-            if self.x + 16 < x and check(self.x + 17, self.y + 16):
-                self.x += 1
-            if self.x + 16 > x and check(self.x + 15, self.y + 16):
-                self.x -= 1
-            if self.y + 16 < y and check(self.x + 16, self.y + 17):
-                self.y += 1
-            if self.y + 16 > y and check(self.x + 16, self.y + 15):
-                self.y -= 1
-            if (self.x < x < self.x + 32) and (self.y < y < self.y + 32):
-                health[0] -= 1
-            if self.sprite < 10:
-                self.image = Emeny.image2
-                self.sprite += 1
-            elif self.sprite < 20:
-                self.image = Emeny.image
-                self.sprite += 1
-            else:
-                self.sprite = 0
-        self.rect.x = size[0] // 2 + self.x - x
-        self.rect.y = size[1] // 2 + self.y - y
-
 
 class Emeny(pygame.sprite.Sprite):
 
-    def __init__(self, x, y: int, size: list, *group):
+    def __init__(self, x, y: int, *group):
         super().__init__(*group)
         self.x = x
         self.y = y
@@ -96,7 +62,43 @@ class Slime(Emeny):
     image2 = pygame.image.load('data/slime2.png')
 
     def __init__(self, x, y: int, size: list, *group):
-        super().__init__(x, y, size, *group)
+        super().__init__(x, y, *group)
+        self.image = Slime.image
+        self.rect = self.image.get_rect()
+        self.rect.x = size[0] // 2 + self.x - x
+        self.rect.y = size[1] // 2 + self.y - y
+        self.maxhp = 2
+        self.health = self.maxhp
+        self.func = 0
+
+    def update(self, x, y, size, check, add, health):
+        if abs(self.x - x) + abs(self.y - y) < 250:
+            if self.x + 16 < x and check(self.x + 17, self.y + 16):
+                self.x += 1
+            elif self.x + 16 > x and check(self.x + 15, self.y + 16):
+                self.x -= 1
+            if self.y + 16 < y and check(self.x + 16, self.y + 17):
+                self.y += 1
+            elif self.y + 16 > y and check(self.x + 16, self.y + 15):
+                self.y -= 1
+        super().update(x, y, size, Slime.image, Slime.image2)
+        if (self.x - 16 < x < self.x + 48) and (self.y - 16 < y < self.y + 48):
+            health[0] -= 5
+        self.func = lambda: pygame.draw.line(pygame.display.get_surface()[0], (255, 0, 0), (size[0] // 2 + self.x - x,
+                size[1] // 2 + self.y - 18 - y),  (size[0] // 2 + self.x - x + int(self.health / self.maxhp) * 16,
+                                                  size[1] // 2 + self.y - 18 - y), width=3)
+
+    def draw(self):
+        self.func()
+        super().super().draw()
+
+
+class Elf(Emeny):
+    image = pygame.image.load('data/elf.png')
+    image2 = pygame.image.load('data/elf2.png')
+
+    def __init__(self, x, y: int, size: list, *group):
+        super().__init__(x, y, *group)
         self.image = Slime.image
         self.rect = self.image.get_rect()
         self.rect.x = size[0] // 2 + self.x - x
@@ -113,34 +115,39 @@ class Slime(Emeny):
                 self.y += 1
             elif self.y + 16 > y and check(self.x + 16, self.y + 15):
                 self.y -= 1
-        super().update(x, y, size, Slime.image, Slime.image2)
+        super().update(x, y, size, Elf.image, Elf.image2)
         if (self.x - 16 < x < self.x + 48) and (self.y - 16 < y < self.y + 48):
-                health[0] -= 5
-        if randint(0, 200) == 0:
-            add(Katon_FireBall(self.x, self.y, x, y, size, self.g))
+            health[0] -= 5
+        if randint(0, 50) == 0:
+            add(KatonFireBall(self.x, self.y, x, y, size, self.g))
 
-class Katon_FireBall(Emeny):
+
+class KatonFireBall(Emeny):
     image = pygame.image.load('data/fireball.png')
     image2 = pygame.image.load('data/fireball2.png')
 
     def __init__(self, x, y, mx, my: int, size: list, *group):
-        super().__init__(x, y, size, *group)
+        super().__init__(x, y, *group)
         self.x = x
         self.y = y
-        self.image = Katon_FireBall.image
+        self.image = KatonFireBall.image
         self.rect = self.image.get_rect()
         self.rect.x = size[0] // 2 + self.x - mx
         self.rect.y = size[1] // 2 + self.y - my
         self.health = 1
-
+        self.end = (mx - 16, my - 16)
 
     def update(self, x, y, size, check, add, health):
-        self.x, self.y = next(self.x, self.y, x-16, y-16, 2)
-        super().update(x, y, size, Katon_FireBall.image, Katon_FireBall.image2)
-        if not check(self.x+16, self.y+16):
+        self.x, self.y = next_step(self.x, self.y, self.end[0], self.end[1], 2)
+        super().update(x, y, size, KatonFireBall.image, KatonFireBall.image2)
+        if not check(self.x + 16, self.y + 16, 8):
             self.health = 0
         if (x - 16 < self.x + 16 < x + 16) and (y - 16 < self.y + 16 < y + 16):
-            health[0] -= 200
+            health[0] -= 80
+            self.health = 0
+        if abs(self.x - self.end[0]) < 3 and abs(self.y - self.end[1]) < 3:
+            self.health = 0
+        if self.x - 1 == self.end[0] - 1 and self.y - 1 == self.end[1] - 1:
             self.health = 0
         if self.health == 0:
             add(self, 1)

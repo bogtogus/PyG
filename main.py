@@ -1,28 +1,60 @@
-import pygame, time, random, datetime
 from math import cos, sin, pi
-import invertory, emeny, items
+
+from accessify import private
+
+import datetime
+import pygame
+import time
+
+from libs import emeny
+from libs import invertory
+from libs import items
 
 t1 = datetime.datetime.now()
 
-addk = 0
+def joyer(n):
+    if n == 'w':
+        user.KeyPressed.append(pygame.K_w)
+    if n == 'a':
+        user.KeyPressed.append(pygame.K_a)
+    if n == 's':
+        user.KeyPressed.append(pygame.K_s)
+    if n == 'd':
+        user.KeyPressed.append(pygame.K_d)
+
+
+def joyClean():
+    if pygame.K_w in user.KeyPressed:
+        del user.KeyPressed[user.KeyPressed.index(pygame.K_w)]
+    if pygame.K_a in user.KeyPressed:
+        del user.KeyPressed[user.KeyPressed.index(pygame.K_a)]
+    if pygame.K_s in user.KeyPressed:
+        del user.KeyPressed[user.KeyPressed.index(pygame.K_s)]
+    if pygame.K_d in user.KeyPressed:
+        del user.KeyPressed[user.KeyPressed.index(pygame.K_d)]
 
 # смена кадров и счёт fps
 def flip():
     global t1
     pygame.draw.rect(user.screen, 'black', (0, 0, 40, 20))
     try:
-        user.screen.blit(font.render(str(int(1000 / ((datetime.datetime.now() - t1).microseconds / 1000))), True, 'yellow'), (0, 0))
-    except:
-        user.screen.blit(font.render('err', True, 'red'), (0, 0))
+        user.screen.blit(
+            font.render(str(int(1000 / ((datetime.datetime.now() - t1).microseconds / 1000))), True, (255, 255, 0)),
+            (0, 0))
+    except ZeroDivisionError:
+        user.screen.blit(font.render('err', True, (255, 0, 0)), (0, 0))
     pygame.display.flip()
     t1 = datetime.datetime.now()
+
 
 # отрисовка кода
 def hud():
     user.screen.fill((0, 0, 0))
     user.level.draw()
+    user.AS.draw(user.screen)
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 64, 0, 32, 96), width=1)
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 96, 32, 96, 32), width=1)
+
 
 # управляющий класс
 class settings:
@@ -36,17 +68,21 @@ class settings:
         self.screen = None
         self.AS = pygame.sprite.Group()
         self.S = []
+        self.floor = []
 
+    @private
     def load_guys(self, path):
         self.AS = pygame.sprite.Group()
-        with open('maps/level1.guys', 'r') as data:
+        with open(path, 'r') as data:
             data2 = [i.replace('\n', '') for i in data.readlines()]
             MainHero.x = int(data2[0].split()[0])
             MainHero.y = int(data2[0].split()[1])
-            for i in data2[1:]:
+            self.floor = [int(i) for i in data2[1].split(' ')]
+            for i in data2[2:]:
+                if i.split()[0] == 'Elf':
+                    self.S.append(emeny.Elf(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Slime':
                     self.S.append(emeny.Slime(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
-            print(len(self.S))
 
     def add(self, sth, todo=0):
         if todo == 0:
@@ -57,6 +93,17 @@ class settings:
                     self.AS.remove(self.S[i])
                     del self.S[i]
                     break
+
+    def change_level(self, path: str):
+        with open(path + '.map') as data:
+            self.level = Map([list(map(int, i.split())) for i in data.readlines()])
+        for i in self.S:
+            self.AS.remove(i)
+        self.S = []
+        self.load_guys(path + '.guys')
+
+
+
 # класс карты
 class Map:
     def __init__(self, map: list):
@@ -77,36 +124,39 @@ class Map:
                     continue
                 if self.map[j][i] == 0:
                     user.screen.blit(self.grass, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                            user.size[1] // 2 + j * 32 - MainHero.y))
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 1:
                     user.screen.blit(self.wall, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                               user.size[1] // 2 + j * 32 - MainHero.y))
+                                                 user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 2:
                     user.screen.blit(self.stone, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 3:
                     user.screen.blit(self.barrier, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+                                                    user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 4:
                     user.screen.blit(self.barrierh, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+                                                     user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 5:
                     user.screen.blit(self.bar, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+                                                user.size[1] // 2 + j * 32 - MainHero.y))
 
                 elif self.map[j][i] == 6:
                     user.screen.blit(self.portal, (user.size[0] // 2 + i * 32 - MainHero.x,
-                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+                                                   user.size[1] // 2 + j * 32 - MainHero.y))
 
     # функция проверки не вошёл ли объект (x, y (32x32px)) в текстуру
-    def check(self, x, y: int):
+    def check(self, x, y: int, size=16):
         try:
-            if self.map[(y - 16) // 32][(x - 16) // 32] == 0 and self.map[(y - 16) // 32][(x + 15) // 32] == 0 and\
-                    self.map[(y + 15) // 32][(x - 16) // 32] == 0 and self.map[(y + 15) // 32][(x + 15) // 32] == 0:
+            if self.map[(y - size) // 32][(x - size) // 32] in user.floor and\
+                    self.map[(y - size) // 32][(x + size - 1) // 32] in user.floor and\
+                    self.map[(y + size - 1) // 32][(x - size) // 32] in user.floor and\
+                    self.map[(y + size - 1) // 32][(x + size - 1) // 32] in user.floor:
                 return True
             return False
         except IndexError:
             return False
+
 
 # класс главного героя
 class Hero:
@@ -121,7 +171,7 @@ class Hero:
         self.manna = 1000
         self.health = 1000
         self.back = invertory.inv()
-        self.equip = [0 for i in range(5)]
+        self.equip = [None for i in range(5)]
 
     # функция отрисовки героя и его параметров(health, stamina, manna)
     def draw(self):
@@ -148,7 +198,7 @@ class Hero:
             pygame.draw.line(user.screen, 'green', (user.size[0] // 2 - 16, user.size[1] // 2 - 18),
                              (user.size[0] // 2 - 16 + (self.health // 31), user.size[1] // 2 - 18), width=3)
 
-        if self.equip[0] != 0:
+        if self.equip[0]:
             self.equip[0].DrawEquip(user.screen, user.size)
 
     # функция отрисовки удара и просчёт нанесения урона по Emeny
@@ -176,41 +226,47 @@ class Hero:
         pov = (pov + 50) // 90
         k = 0
         for i in range(len(user.S)):
-            if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= user.S[i - k].x < MainHero.x + 16:
+            if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= \
+                    user.S[i - k].x < MainHero.x + 16:
                 user.S[i - k].health -= 1
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
-            if pov == 1 and MainHero.y - 16 <= user.S[i - k].y <= MainHero.y + 16 and MainHero.x - 32 <= user.S[i - k].x < MainHero.x:
+            if pov == 1 and MainHero.y - 16 <= user.S[i - k].y <= MainHero.y + 16 and MainHero.x - 32 <= \
+                    user.S[i - k].x < MainHero.x:
                 user.S[i - k].health -= 1
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
-            if pov == 2 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 48 <= user.S[i - k].x < MainHero.x - 16:
+            if pov == 2 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 48 <= \
+                    user.S[i - k].x < MainHero.x - 16:
                 user.S[i - k].health -= 1
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
-            if pov == 3 and MainHero.y - 48 <= user.S[i - k].y <= MainHero.y - 16 and MainHero.x - 32 <= user.S[i - k].x < MainHero.x :
+            if pov == 3 and MainHero.y - 48 <= user.S[i - k].y <= MainHero.y - 16 and MainHero.x - 32 <= \
+                    user.S[i - k].x < MainHero.x:
                 user.S[i - k].health -= 1
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
 
-pygame.init()
-with open('maps/level1.map') as data:
-    user = settings(autosize=1, level=Map([list(map(int, i.split())) for i in data.readlines()]))
 
 if __name__ == '__main__':
 
+    pygame.init()
+    pygame.joystick.init()
+    joy = pygame.joystick.Joystick(0)
+    MainHero = Hero()
+    user = settings(autosize=True)
+    user.change_level('maps/level1')
     # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')
-
 
     pygame.display.set_caption('PyG')
 
@@ -220,17 +276,28 @@ if __name__ == '__main__':
     font = pygame.font.Font(None, 30)
     MainLoop = True
     clock = pygame.time.Clock()
-    MainHero = Hero()
+
     MainHero.image.convert_alpha()
     MainHero.back.append(items.weapon(10))
 
     # создание Emeny
-    user.load_guys('maps/level1.guys')
 
     while MainLoop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 MainLoop = False
+            if event.type == pygame.JOYAXISMOTION:
+                joyClean()
+                if joy.get_axis(0) > 0.4:
+                    joyer('d')
+                if joy.get_axis(0) < -0.4:
+                    joyer('a')
+                if joy.get_axis(1) > 0.4:
+                    joyer('s')
+                if joy.get_axis(1) < -0.4:
+                    joyer('w')
+
+
             if event.type == pygame.MOUSEMOTION:
                 cursor = event.pos
             if event.type == pygame.KEYDOWN:
@@ -241,7 +308,7 @@ if __name__ == '__main__':
                 except:
                     pass
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if user.size[0] // 2 - 20 < event.pos[0] < user.size[0] // 2 + 20 and\
+                if user.size[0] // 2 - 20 < event.pos[0] < user.size[0] // 2 + 20 and \
                         user.size[1] // 2 - 20 < event.pos[1] < user.size[1] // 2 + 20:
                     MainHero.health -= 300
                 else:
@@ -290,49 +357,48 @@ if __name__ == '__main__':
                     MainHero.flipped = False
 
             if pygame.K_SPACE in user.KeyPressed:
+                hud()
+                CanJump = True
+                if MainHero.pow == 0 and MainHero.x < len(user.level.map[0]) * 32 - 144 and \
+                        user.level.check(MainHero.x + 128, MainHero.y) and MainHero.stamina > 300:
+                    MainHero.stamina -= 300
+                    MainHero.x += 128
+                elif MainHero.pow == 1 and MainHero.y < len(user.level.map) * 32 - 144 and \
+                        user.level.check(MainHero.x, MainHero.y + 128) and MainHero.stamina > 300:
+                    MainHero.stamina -= 300
+                    MainHero.y += 128
+                elif MainHero.pow == 2 and MainHero.x > 144 and \
+                        user.level.check(MainHero.x - 128, MainHero.y) and MainHero.stamina > 300:
+                    MainHero.stamina -= 300
+                    MainHero.x -= 128
+                elif MainHero.pow == 3 and MainHero.y > 144 and \
+                        user.level.check(MainHero.x, MainHero.y - 128) and MainHero.stamina > 300:
+                    MainHero.stamina -= 300
+                    MainHero.y -= 128
+                else:
+                    CanJump = False
+                if CanJump:
+                    tempx = user.size[0] // 2
+                    tempy = user.size[1] // 2
+                    for i in range(1, 15):
+                        if MainHero.pow == 0:
+                            tempx -= i
+                        if MainHero.pow == 1:
+                            tempy -= i
+                        if MainHero.pow == 2:
+                            tempx += i
+                        if MainHero.pow == 3:
+                            tempy += i
+                        user.screen.blit(run_image, (tempx - 16, tempy - 16))
+                        flip()
+                        MainHero.draw()
+                        time.sleep(0.01)
                     hud()
-                    CanJump = True
-                    if MainHero.pow == 0 and MainHero.x < len(user.level.map[0]) * 32 - 144 and\
-                            user.level.check(MainHero.x + 128, MainHero.y) and MainHero.stamina > 300:
-                        MainHero.stamina -= 300
-                        MainHero.x += 128
-                    elif MainHero.pow == 1 and MainHero.y < len(user.level.map) * 32 - 144 and\
-                            user.level.check(MainHero.x, MainHero.y + 128) and MainHero.stamina > 300:
-                        MainHero.stamina -= 300
-                        MainHero.y += 128
-                    elif MainHero.pow == 2 and MainHero.x > 144 and\
-                            user.level.check(MainHero.x - 128, MainHero.y) and MainHero.stamina > 300:
-                        MainHero.stamina -= 300
-                        MainHero.x -= 128
-                    elif MainHero.pow == 3 and MainHero.y > 144 and\
-                            user.level.check(MainHero.x, MainHero.y - 128) and MainHero.stamina > 300:
-                        MainHero.stamina -= 300
-                        MainHero.y -= 128
-                    else:
-                        CanJump = False
-                    hud()
-                    if CanJump:
-                        tempx = user.size[0] // 2
-                        tempy = user.size[1] // 2
-                        for i in range(1, 15):
-                            if MainHero.pow == 0:
-                                tempx -= i
-                            if MainHero.pow == 1:
-                                tempy -= i
-                            if MainHero.pow == 2:
-                                tempx += i
-                            if MainHero.pow == 3:
-                                tempy += i
-                            user.screen.blit(run_image, (tempx - 16, tempy - 16))
-                            flip()
-                            MainHero.draw()
-                            time.sleep(0.01)
 
             if pygame.K_e in user.KeyPressed:
                 user.KeyPressed = []
                 hud()
                 MainHero.draw()
-                user.AS.draw(user.screen)
                 flip()
                 ret = invertory.draw(user.screen, MainHero.back, cursor[0], cursor[1])
                 if ret != -1:
@@ -346,7 +412,6 @@ if __name__ == '__main__':
         user.AS.update(MainHero.x, MainHero.y, user.size, user.level.check, user.add, health)
         MainHero.health = health[0]
         health = None
-        user.AS.draw(user.screen)
         user.screen.blit(cursori, cursor)
         flip()
         clock.tick(user.fps)
@@ -360,7 +425,6 @@ if __name__ == '__main__':
             MainHero.health += 1
         if MainHero.manna < 1000:
             MainHero.manna += 1
-
 
     # YOU DIED
     MainLoop = False
