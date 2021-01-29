@@ -1,5 +1,4 @@
 import pygame
-import accessify
 
 class Weapon:
     __image = pygame.image.load('data/sword.png')
