@@ -1,12 +1,13 @@
 from math import cos, sin, pi
 
-from accessify import private
+
 
 import datetime
 import pygame
 import time
 
 from libs import emeny
+from libs import barman
 from libs import invertory
 from libs import items
 
@@ -71,7 +72,7 @@ class settings:
         self.S = []
         self.floor = []
 
-    @private
+
     def load_guys(self, path):
         self.AS = pygame.sprite.Group()
         with open(path, 'r') as data:
@@ -80,6 +81,8 @@ class settings:
             MainHero.y = int(data2[0].split()[1])
             self.floor = [int(i) for i in data2[1].split(' ')]
             for i in data2[2:]:
+                if i.split()[0] == 'Bar':
+                    self.S.append(barman.Bar(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Elf':
                     self.S.append(emeny.Elf(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Slime':
@@ -116,6 +119,10 @@ class Map:
         self.portal = pygame.image.load('data/portal.png')
         self.bar = pygame.image.load('data/bar.png')
         self.stone = pygame.image.load('data/stone.png')
+        self.bookcase = pygame.image.load('data/bookcase.png')
+        self.table = pygame.image.load('data/table.png')
+        self.chair = pygame.image.load('data/chair.png')
+        self.door = pygame.image.load('data/Снимок экрана 2021-01-01 в 20.27.53.png')
         self.stone.set_colorkey(-1)
 
     def draw(self):
@@ -141,9 +148,22 @@ class Map:
                 elif self.map[j][i] == 5:
                     user.screen.blit(self.bar, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                 user.size[1] // 2 + j * 32 - MainHero.y))
+
                 elif self.map[j][i] == 6:
                     user.screen.blit(self.portal, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                    user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 7:
+                    user.screen.blit(self.bookcase, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                   user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 8:
+                    user.screen.blit(self.chair, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                   user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 9:
+                    user.screen.blit(self.table, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                   user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 10:
+                    user.screen.blit(self.door, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
 
     # функция проверки не вошёл ли объект (x, y (32x32px)) в текстуру
     def check(self, x, y: int, size=16):
@@ -261,11 +281,7 @@ if __name__ == '__main__':
 
     pygame.init()
     pygame.joystick.init()
-    if pygame.joystick.get_count():
-        joy = pygame.joystick.Joystick(0)
-    else:
-        joy = None
-
+    joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
     user = settings(autosize=True)
     user.change_level('maps/level1')
@@ -281,6 +297,7 @@ if __name__ == '__main__':
     font = pygame.font.Font(None, 30)
     MainLoop = True
     clock = pygame.time.Clock()
+
     MainHero.image.convert_alpha()
     MainHero.back.append(items.Weapon(2, 0.5))
     MainHero.back.append(items.Armor(20, 0.1))
@@ -429,6 +446,7 @@ if __name__ == '__main__':
         user.screen.blit(cursori, cursor)
         flip()
         clock.tick(user.fps)
+
         if MainHero.health < 0:
             MainLoop = False
 
