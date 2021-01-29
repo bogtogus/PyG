@@ -126,6 +126,7 @@ class Map:
         self.apple = pygame.image.load('data/apple.png')
         self.water = pygame.image.load('data/Снимок экрана 2021-01-29 в 22.22.33.png')
         self.sewer = pygame.image.load('data/Снимок экрана 2021-01-29 в 22.32.39.png')
+        self.easter_egg  = pygame.image.load('data/Снимок экрана 2021-01-29 в 23.32.13.png')
         self.stone.set_colorkey(-1)
 
     def draw(self):
@@ -175,6 +176,10 @@ class Map:
                                                   user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 14:
                     user.screen.blit(self.sewer, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+
+                elif self.map[j][i] == 15:
+                    user.screen.blit(self.easter_egg, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                   user.size[1] // 2 + j * 32 - MainHero.y))
 
     # функция проверки не вошёл ли объект (x, y (32x32px)) в текстуру
