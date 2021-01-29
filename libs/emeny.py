@@ -170,13 +170,13 @@ class Boss(pygame.sprite.Sprite):
         self.sprite = 0
 
     def update(self, x, y, size, check, add, health):
-        if self.x + 48 < x and check(self.x + 98, self.y + 48):
+        if self.x + 48 < x and check(self.x + 50, self.y + 48, size=48):
             self.x += 2
-        elif self.x + 48 > x and check(self.x - 2, self.y + 48):
+        elif self.x + 48 > x and check(self.x + 46, self.y + 48, size=48):
             self.x -= 2
-        if self.y + 48 < y and check(self.x + 48, self.y + 98):
+        if self.y + 48 < y and check(self.x + 48, self.y + 50, size=48):
             self.y += 2
-        elif self.y + 48 > y and check(self.x + 48, self.y - 2):
+        elif self.y + 48 > y and check(self.x + 48, self.y + 46, size=48):
             self.y -= 2
 
         if self.sprite < 90:
