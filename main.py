@@ -80,7 +80,9 @@ class settings:
             MainHero.x = int(data2[0].split()[0])
             MainHero.y = int(data2[0].split()[1])
             self.floor = [int(i) for i in data2[1].split(' ')]
-            for i in data2[2:]:
+            pygame.mixer.music.load('music/' + data2[2])
+            pygame.mixer.music.play(-1)
+            for i in data2[3:]:
                 if i.split()[0] == 'Bar':
                     self.S.append(barman.Bar(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Elf':
