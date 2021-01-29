@@ -170,14 +170,14 @@ class Boss(pygame.sprite.Sprite):
         self.sprite = 0
 
     def update(self, x, y, size, check, add, health):
-        if self.x + 48 < x and check(self.x + 50, self.y + 48, size=48):
-            self.x += 2
-        elif self.x + 48 > x and check(self.x + 46, self.y + 48, size=48):
-            self.x -= 2
-        if self.y + 48 < y and check(self.x + 48, self.y + 50, size=48):
-            self.y += 2
-        elif self.y + 48 > y and check(self.x + 48, self.y + 46, size=48):
-            self.y -= 2
+        if self.x + 96 < x and check(self.x + 98, self.y + 96, size=96):
+            self.x += 1
+        elif self.x + 96 > x and check(self.x + 94, self.y + 96, size=96):
+            self.x -= 1
+        if self.y + 96 < y and check(self.x + 96, self.y + 98, size=96):
+            self.y += 1
+        elif self.y + 96 > y and check(self.x + 96, self.y + 94, size=96):
+            self.y -= 1
 
         if self.sprite < 90:
             self.image = Boss.__sprite[self.sprite // 10]
@@ -187,10 +187,10 @@ class Boss(pygame.sprite.Sprite):
         self.rect.x = size[0] // 2 + self.x - x
         self.rect.y = size[1] // 2 + self.y - y
 
-        if (self.x - 16 < x < self.x + 112) and (self.y - 16 < y < self.y + 112):
+        if (self.x - 16 < x < self.x + 208) and (self.y - 16 < y < self.y + 208):
             health[0] -= 7
 
         pygame.draw.line(pygame.display.get_surface(), (128, 0, 255), (size[0] // 2 + self.x - x,
                                                                      size[1] // 2 + self.y - 10 - y),
-                         (size[0] // 2 + self.x - x + int(self.health / self.fullhp * 96),
+                         (size[0] // 2 + self.x - x + int(self.health / self.fullhp * 192),
                           size[1] // 2 + self.y - 10 - y), width=3)

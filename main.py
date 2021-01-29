@@ -1,7 +1,5 @@
 from math import cos, sin, pi
 
-
-
 import datetime
 import pygame
 import time
@@ -251,8 +249,10 @@ class Hero:
         pov = (pov + 50) // 90
         k = 0
         for i in range(len(user.S)):
-            if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= \
-                    user.S[i - k].x < MainHero.x + 16:
+
+            size = user.S[i].rect.x
+            if pov == 0 and user.S[i - k].y <= MainHero.y <= user.S[i - k].y + size * 2 and\
+                    MainHero.x - user.S[i].rect.x <= user.S[i - k].x < MainHero.x + user.S[i].rect.x:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
@@ -304,7 +304,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     MainHero.image.convert_alpha()
-    MainHero.back.append(items.Weapon(2, 0.5))
+    MainHero.back.append(items.Weapon(20, 0.5))
     MainHero.back.append(items.Armor(20, 0.1))
 
     # создание Emeny
@@ -450,6 +450,11 @@ if __name__ == '__main__':
         health = None
         user.screen.blit(cursori, cursor)
         flip()
+
+        user.screen.blit(font.render(str((MainHero.x, MainHero.y)), True, (255, 255, 0)), (200, 0))
+        user.screen.blit(font.render(str((user.S[0].x, user.S[0].y)), True, (255, 255, 0)), (300, 0))
+        pygame.display.flip()
+
         clock.tick(user.fps)
 
         if MainHero.health < 0:
