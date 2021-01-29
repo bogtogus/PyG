@@ -285,7 +285,8 @@ if __name__ == '__main__':
 
     pygame.init()
     pygame.joystick.init()
-    joy = pygame.joystick.Joystick(0)
+    if pygame.joystick.get_count() > 0:
+        joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
     user = settings(autosize=True)
     user.change_level('maps/lobby')
