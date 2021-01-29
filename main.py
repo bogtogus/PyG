@@ -284,7 +284,7 @@ if __name__ == '__main__':
     joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
     user = settings(autosize=True)
-    user.change_level('maps/level1')
+    user.change_level('maps/lobby')
     # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')
