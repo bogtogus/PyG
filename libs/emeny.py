@@ -67,7 +67,7 @@ class Slime(Emeny):
         self.rect = self.image.get_rect()
         self.rect.x = size[0] // 2 + self.x - x
         self.rect.y = size[1] // 2 + self.y - y
-        self.maxhp = 2
+        self.maxhp = 20
         self.health = self.maxhp
         self.func = 0
 
@@ -84,13 +84,9 @@ class Slime(Emeny):
         super().update(x, y, size, Slime.image, Slime.image2)
         if (self.x - 16 < x < self.x + 48) and (self.y - 16 < y < self.y + 48):
             health[0] -= 5
-        self.func = lambda: pygame.draw.line(pygame.display.get_surface()[0], (255, 0, 0), (size[0] // 2 + self.x - x,
-                size[1] // 2 + self.y - 18 - y),  (size[0] // 2 + self.x - x + int(self.health / self.maxhp) * 16,
+        pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), (size[0] // 2 + self.x - x,
+                size[1] // 2 + self.y - 18 - y),  (size[0] // 2 + self.x - x + int(self.health / self.maxhp * 32),
                                                   size[1] // 2 + self.y - 18 - y), width=3)
-
-    def draw(self):
-        self.func()
-        super().super().draw()
 
 
 class Elf(Emeny):
@@ -103,7 +99,8 @@ class Elf(Emeny):
         self.rect = self.image.get_rect()
         self.rect.x = size[0] // 2 + self.x - x
         self.rect.y = size[1] // 2 + self.y - y
-        self.health = 2
+        self.maxhp = 200
+        self.health = self.maxhp
 
     def update(self, x, y, size, check, add, health):
         if abs(self.x - x) + abs(self.y - y) < 250:
@@ -120,6 +117,9 @@ class Elf(Emeny):
             health[0] -= 5
         if randint(0, 50) == 0:
             add(KatonFireBall(self.x, self.y, x, y, size, self.g))
+        pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), (size[0] // 2 + self.x - x,
+                size[1] // 2 + self.y - 18 - y), (size[0] // 2 + self.x - x + int(self.health / self.maxhp * 32),
+                size[1] // 2 + self.y - 18 - y), width=3)
 
 
 class KatonFireBall(Emeny):

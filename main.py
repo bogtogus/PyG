@@ -13,6 +13,7 @@ from libs import items
 t1 = datetime.datetime.now()
 
 def joyer(n):
+    global MainHero
     if n == 'w':
         user.KeyPressed.append(pygame.K_w)
     if n == 'a':
@@ -198,8 +199,9 @@ class Hero:
             pygame.draw.line(user.screen, 'green', (user.size[0] // 2 - 16, user.size[1] // 2 - 18),
                              (user.size[0] // 2 - 16 + (self.health // 31), user.size[1] // 2 - 18), width=3)
 
-        if self.equip[0]:
-            self.equip[0].DrawEquip(user.screen, user.size)
+        for i in range(len(self.equip)):
+            if self.equip[i]:
+                self.equip[i].DrawEquip(user.screen, user.size)
 
     # функция отрисовки удара и просчёт нанесения урона по Emeny
     def punch(self, pov):
@@ -228,28 +230,28 @@ class Hero:
         for i in range(len(user.S)):
             if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= \
                     user.S[i - k].x < MainHero.x + 16:
-                user.S[i - k].health -= 1
+                user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
             if pov == 1 and MainHero.y - 16 <= user.S[i - k].y <= MainHero.y + 16 and MainHero.x - 32 <= \
                     user.S[i - k].x < MainHero.x:
-                user.S[i - k].health -= 1
+                user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
             if pov == 2 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 48 <= \
                     user.S[i - k].x < MainHero.x - 16:
-                user.S[i - k].health -= 1
+                user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
             if pov == 3 and MainHero.y - 48 <= user.S[i - k].y <= MainHero.y - 16 and MainHero.x - 32 <= \
                     user.S[i - k].x < MainHero.x:
-                user.S[i - k].health -= 1
+                user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
@@ -260,7 +262,11 @@ if __name__ == '__main__':
 
     pygame.init()
     pygame.joystick.init()
-    joy = pygame.joystick.Joystick(0)
+    if pygame.joystick.get_count():
+        joy = pygame.joystick.Joystick(0)
+    else:
+        joy = None
+
     MainHero = Hero()
     user = settings(autosize=True)
     user.change_level('maps/level1')
@@ -276,9 +282,9 @@ if __name__ == '__main__':
     font = pygame.font.Font(None, 30)
     MainLoop = True
     clock = pygame.time.Clock()
-
     MainHero.image.convert_alpha()
-    MainHero.back.append(items.weapon(10))
+    MainHero.back.append(items.Weapon(2, 0.5))
+    MainHero.back.append(items.Armor(20, 0.1))
 
     # создание Emeny
 
@@ -296,7 +302,11 @@ if __name__ == '__main__':
                     joyer('s')
                 if joy.get_axis(1) < -0.4:
                     joyer('w')
-
+                if joy.get_axis(5) > 0.99:
+                    MainHero.punch(MainHero.pow * 90 - 50)
+                if joy.get_axis(2) > 0.99:
+                    if pygame.K_SPACE not in user.KeyPressed:
+                        user.KeyPressed.append(pygame.K_SPACE)
 
             if event.type == pygame.MOUSEMOTION:
                 cursor = event.pos
@@ -394,6 +404,7 @@ if __name__ == '__main__':
                         MainHero.draw()
                         time.sleep(0.01)
                     hud()
+                    del user.KeyPressed[user.KeyPressed.index(pygame.K_SPACE)]
 
             if pygame.K_e in user.KeyPressed:
                 user.KeyPressed = []
@@ -403,19 +414,22 @@ if __name__ == '__main__':
                 ret = invertory.draw(user.screen, MainHero.back, cursor[0], cursor[1])
                 if ret != -1:
                     if ret[1] == 1:
-                        MainHero.equip[0] = MainHero.back[ret[0] - 1]
+                        if type(MainHero.back[ret[0] - 1]) == items.Weapon:
+                            MainHero.equip[0] = MainHero.back[ret[0] - 1]
+                        elif type(MainHero.back[ret[0] - 1]) == items.Armor:
+                            MainHero.equip[1] = MainHero.back[ret[0] - 1]
 
         # отрисовка всякой всячены(иницализированой в одном из прошлых комментариев)
         hud()
         MainHero.draw()
-        health = [MainHero.health]
+        health = [MainHero.health] # Передача в функцию user.AS.update ссылки на переменную
         user.AS.update(MainHero.x, MainHero.y, user.size, user.level.check, user.add, health)
-        MainHero.health = health[0]
+        MainHero.health = ((MainHero.health if MainHero.equip[1].defend * len(user.S) > (MainHero.health - health[0])
+                     else health[0] + MainHero.equip[1].defend * len(user.S)) if MainHero.equip[1] else health[0])
         health = None
         user.screen.blit(cursori, cursor)
         flip()
         clock.tick(user.fps)
-
         if MainHero.health < 0:
             MainLoop = False
 
