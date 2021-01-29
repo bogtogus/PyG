@@ -45,14 +45,3 @@ def draw(SCREEN: pygame.surface, back: inv, x, y):
                         return (r, event.button)
                 return -1
         pygame.display.flip()
-
-
-if __name__ == '__main__':
-    pygame.init()
-    pygame.display.set_caption('PyG')
-    print(pygame.display.Info().current_w, pygame.display.Info().current_h)
-    screen = pygame.display.set_mode((720, 720), pygame.FULLSCREEN)
-    b = inv()
-    b.extend((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 12, 12, 12, 87, 8787, 78, 78, 65, 45, 4, 4, 1, 5))
-    print(draw(screen, b, 128, 64))
-    clock = pygame.time.Clock()

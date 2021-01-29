@@ -141,7 +141,6 @@ class Map:
                 elif self.map[j][i] == 5:
                     user.screen.blit(self.bar, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                 user.size[1] // 2 + j * 32 - MainHero.y))
-
                 elif self.map[j][i] == 6:
                     user.screen.blit(self.portal, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                    user.size[1] // 2 + j * 32 - MainHero.y))
