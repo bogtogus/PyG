@@ -122,6 +122,11 @@ class Elf(Emeny):
                 size[1] // 2 + self.y - 18 - y), width=3)
 
 
+class Boss(pygame.sprite.Sprite):
+    def __init__(self):
+        pass
+
+
 class KatonFireBall(Emeny):
     image = pygame.image.load('data/fireball.png')
     image2 = pygame.image.load('data/fireball2.png')
