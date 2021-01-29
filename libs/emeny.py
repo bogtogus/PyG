@@ -124,7 +124,7 @@ class Elf(Emeny):
 
 class Boss(pygame.sprite.Sprite):
     def __init__(self):
-
+        pass
 
 
 class KatonFireBall(Emeny):
