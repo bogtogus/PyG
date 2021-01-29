@@ -123,6 +123,9 @@ class Map:
         self.table = pygame.image.load('data/table.png')
         self.chair = pygame.image.load('data/chair.png')
         self.door = pygame.image.load('data/Снимок экрана 2021-01-01 в 20.27.53.png')
+        self.apple = pygame.image.load('data/apple.png')
+        self.water = pygame.image.load('data/Снимок экрана 2021-01-29 в 22.22.33.png')
+        self.sewer = pygame.image.load('data/Снимок экрана 2021-01-29 в 22.32.39.png')
         self.stone.set_colorkey(-1)
 
     def draw(self):
@@ -158,11 +161,20 @@ class Map:
                 elif self.map[j][i] == 8:
                     user.screen.blit(self.chair, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                    user.size[1] // 2 + j * 32 - MainHero.y))
-                elif self.map[j][i] == 9:
+                elif self.map[j][i] == 11:
                     user.screen.blit(self.table, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                    user.size[1] // 2 + j * 32 - MainHero.y))
                 elif self.map[j][i] == 10:
                     user.screen.blit(self.door, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 12:
+                    user.screen.blit(self.apple, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 13:
+                    user.screen.blit(self.water, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 14:
+                    user.screen.blit(self.sewer, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                   user.size[1] // 2 + j * 32 - MainHero.y))
 
     # функция проверки не вошёл ли объект (x, y (32x32px)) в текстуру
@@ -281,10 +293,10 @@ if __name__ == '__main__':
 
     pygame.init()
     pygame.joystick.init()
-    joy = pygame.joystick.Joystick(0)
+#    joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
     user = settings(autosize=True)
-    user.change_level('maps/lobby')
+    user.change_level('maps/level2')
     # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')
