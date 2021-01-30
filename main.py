@@ -250,9 +250,9 @@ class Hero:
         k = 0
         for i in range(len(user.S)):
 
-            size = user.S[i].rect.x
-            if pov == 0 and user.S[i - k].y <= MainHero.y <= user.S[i - k].y + size * 2 and\
-                    MainHero.x - user.S[i].rect.x <= user.S[i - k].x < MainHero.x + user.S[i].rect.x:
+            size = user.S[i].rect.x - 16
+            if pov == 0 and MainHero.y - 32 <= user.S[i - k].y + size <= MainHero.y and MainHero.x - 16 <= \
+                    user.S[i - k].x + size <= MainHero.x + 16:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
