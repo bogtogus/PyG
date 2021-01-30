@@ -153,11 +153,6 @@ class Elf(Emeny):
                 size[1] // 2 + self.y - 18 - y), width=3)
 
 
-class Boss(pygame.sprite.Sprite):
-    def __init__(self):
-        pass
-
-
 class KatonFireBall(Emeny):
     image = pygame.image.load('data/fireball.png')
     image2 = pygame.image.load('data/fireball2.png')
@@ -187,3 +182,46 @@ class KatonFireBall(Emeny):
             self.health = 0
         if self.health == 0:
             add(self, 1)
+
+
+class Boss(pygame.sprite.Sprite):
+    __sprite = [pygame.image.load('data/ricardo/ric (' + str(i) + ').png') for i in range(1, 10)]
+    for i in __sprite:
+        i.set_colorkey((0, 0, 0))
+    def __init__(self, x, y, size: list, *group):
+        super().__init__(*group)
+        self.x = x
+        self.y = y
+        self.image = Boss.__sprite[0]
+        self.rect = self.image.get_rect()
+        self.rect.x = size[0] // 2 + self.x - x
+        self.rect.y = size[1] // 2 + self.y - y
+        self.fullhp = 200
+        self.health = self.fullhp
+        self.sprite = 0
+
+    def update(self, x, y, size, check, add, health):
+        if self.x + 96 < x and check(self.x + 98, self.y + 96, size=96):
+            self.x += 1
+        elif self.x + 96 > x and check(self.x + 94, self.y + 96, size=96):
+            self.x -= 1
+        if self.y + 96 < y and check(self.x + 96, self.y + 98, size=96):
+            self.y += 1
+        elif self.y + 96 > y and check(self.x + 96, self.y + 94, size=96):
+            self.y -= 1
+
+        if self.sprite < 90:
+            self.image = Boss.__sprite[self.sprite // 10]
+        else:
+            self.sprite = -1
+        self.sprite += 1
+        self.rect.x = size[0] // 2 + self.x - x
+        self.rect.y = size[1] // 2 + self.y - y
+
+        if (self.x - 16 < x < self.x + 208) and (self.y - 16 < y < self.y + 208):
+            health[0] -= 7
+
+        pygame.draw.line(pygame.display.get_surface(), (128, 0, 255), (size[0] // 2 + self.x - x,
+                                                                     size[1] // 2 + self.y - 10 - y),
+                         (size[0] // 2 + self.x - x + int(self.health / self.fullhp * 192),
+                          size[1] // 2 + self.y - 10 - y), width=3)

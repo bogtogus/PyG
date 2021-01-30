@@ -80,7 +80,10 @@ class settings:
             MainHero.x = int(data2[0].split()[0])
             MainHero.y = int(data2[0].split()[1])
             self.floor = [int(i) for i in data2[1].split(' ')]
-            for i in data2[2:]:
+            pygame.mixer.music.load('music/' + data2[2])
+            pygame.mixer.music.play(-1)
+            self.next = data2[3]
+            for i in data2[4:]:
                 if i.split()[0] == 'Bar':
                     self.S.append(barman.Bar(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Elf':
@@ -89,6 +92,8 @@ class settings:
                     self.S.append(emeny.Slime(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Shark':
                     self.S.append(emeny.Shark(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
+                if i.split()[0] == 'Boss':
+                    self.S.append(emeny.Boss(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
 
     def add(self, sth, todo=0):
         if todo == 0:
@@ -267,7 +272,7 @@ class Hero:
         k = 0
         for i in range(len(user.S)):
             if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= \
-                    user.S[i - k].x < MainHero.x + 16:
+                    user.S[i - k].x <= MainHero.x + 16:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
@@ -300,10 +305,11 @@ if __name__ == '__main__':
 
     pygame.init()
     pygame.joystick.init()
-#    joy = pygame.joystick.Joystick(0)
+    if pygame.joystick.get_count() > 0:
+        joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
     user = settings(autosize=True)
-    user.change_level('maps/level2')
+    user.change_level('maps/level1')
     # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')
@@ -318,7 +324,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     MainHero.image.convert_alpha()
-    MainHero.back.append(items.Weapon(2, 0.5))
+    MainHero.back.append(items.Weapon(20, 0.5))
     MainHero.back.append(items.Armor(20, 0.1))
 
     # создание Emeny
@@ -465,6 +471,9 @@ if __name__ == '__main__':
         user.screen.blit(cursori, cursor)
         flip()
         clock.tick(user.fps)
+
+        if user.level.map[MainHero.y // 32][MainHero.x // 32] == 10:
+            user.change_level('maps/' + user.next)
 
         if MainHero.health < 0:
             MainLoop = False
