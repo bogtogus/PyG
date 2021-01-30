@@ -80,7 +80,8 @@ class settings:
             self.floor = [int(i) for i in data2[1].split(' ')]
             pygame.mixer.music.load('music/' + data2[2])
             pygame.mixer.music.play(-1)
-            for i in data2[3:]:
+            self.next = data2[3]
+            for i in data2[4:]:
                 if i.split()[0] == 'Bar':
                     self.S.append(barman.Bar(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Elf':
@@ -250,9 +251,8 @@ class Hero:
         k = 0
         for i in range(len(user.S)):
 
-            size = user.S[i].rect.x - 16
-            if pov == 0 and MainHero.y - 32 <= user.S[i - k].y + size <= MainHero.y and MainHero.x - 16 <= \
-                    user.S[i - k].x + size <= MainHero.x + 16:
+            if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= \
+                    user.S[i - k].x <= MainHero.x + 16:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
                     user.AS.remove(user.S[i - k])
@@ -456,6 +456,9 @@ if __name__ == '__main__':
         pygame.display.flip()
 
         clock.tick(user.fps)
+
+        if user.level.map[MainHero.y // 32][MainHero.x // 32] == 10:
+            user.change_level('maps/' + user.next)
 
         if MainHero.health < 0:
             MainLoop = False
