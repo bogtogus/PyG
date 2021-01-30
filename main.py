@@ -87,6 +87,8 @@ class settings:
                     self.S.append(emeny.Elf(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Slime':
                     self.S.append(emeny.Slime(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
+                if i.split()[0] == 'Shark':
+                    self.S.append(emeny.Shark(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
 
     def add(self, sth, todo=0):
         if todo == 0:

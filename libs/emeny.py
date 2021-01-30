@@ -56,6 +56,37 @@ class Emeny(pygame.sprite.Sprite):
         self.rect.x = size[0] // 2 + self.x - x
         self.rect.y = size[1] // 2 + self.y - y
 
+class Shark(Emeny):
+    image = pygame.image.load('data/Снимок экрана 2021-01-30 в 12.52.32.png')
+    image2 = pygame.image.load('data/Снимок экрана 2021-01-30 в 12.52.32.png')
+
+    def __init__(self, x, y: int, size: list, *group):
+        super().__init__(x, y, *group)
+        self.image = Shark.image
+        self.rect = self.image.get_rect()
+        self.rect.x = size[0] // 2 + self.x - x
+        self.rect.y = size[1] // 2 + self.y - y
+        self.maxhp = 20
+        self.health = self.maxhp
+        self.func = 0
+
+    def update(self, x, y, size, check, add, health):
+        if abs(self.x - x) + abs(self.y - y) < 250:
+            if self.x + 16 < x and check(self.x + 17, self.y + 16):
+                self.x += 1
+            elif self.x + 16 > x and check(self.x + 15, self.y + 16):
+                self.x -= 1
+            if self.y + 16 < y and check(self.x + 16, self.y + 17):
+                self.y += 1
+            elif self.y + 16 > y and check(self.x + 16, self.y + 15):
+                self.y -= 1
+        super().update(x, y, size, Shark.image, Shark.image2)
+        if (self.x - 16 < x < self.x + 48) and (self.y - 16 < y < self.y + 48):
+            health[0] -= 5
+        pygame.draw.line(pygame.display.get_surface(), (255, 0, 0), (size[0] // 2 + self.x - x,
+                size[1] // 2 + self.y - 18 - y),  (size[0] // 2 + self.x - x + int(self.health / self.maxhp * 32),
+                                                  size[1] // 2 + self.y - 18 - y), width=3)
+
 
 class Slime(Emeny):
     image = pygame.image.load('data/slime.png')
