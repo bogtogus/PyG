@@ -59,8 +59,8 @@ class Friend(pygame.sprite.Sprite):
 
 
 class Bar(Friend):
-    image = pygame.image.load('data/elf.png')
-    image2 = pygame.image.load('data/elf2.png')
+    image = pygame.image.load('data/barwomanpg.jpg')
+    image2 = pygame.image.load('data/barwomanpg2.jpg')
 
     def __init__(self, x, y: int, size: list, *group):
         super().__init__(x, y, *group)

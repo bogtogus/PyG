@@ -134,6 +134,12 @@ class Map:
         self.water = pygame.image.load('data/Снимок экрана 2021-01-29 в 22.22.33.png')
         self.sewer = pygame.image.load('data/Снимок экрана 2021-01-29 в 22.32.39.png')
         self.easter_egg  = pygame.image.load('data/Снимок экрана 2021-01-29 в 23.32.13.png')
+        self.reshetka = pygame.image.load('data/Kletka.png')
+        self.reshetkalev = pygame.image.load('data/Kletkalev.png')
+        self.reshetkaprav = pygame.image.load('data/Kletkaprav.png')
+        self.portal = pygame.image.load('data/Снимок экрана 2021-02-01 в 22.26.48.png')
+        self.strang1 = pygame.image.load('data/Снимок экрана 2021-02-01 в 22.33.31.png')
+
         self.stone.set_colorkey(-1)
 
     def draw(self):
@@ -188,6 +194,22 @@ class Map:
                 elif self.map[j][i] == 15:
                     user.screen.blit(self.easter_egg, (user.size[0] // 2 + i * 32 - MainHero.x,
                                                   user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 16:
+                    user.screen.blit(self.reshetka, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 17:
+                    user.screen.blit(self.reshetkalev, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 18:
+                    user.screen.blit(self.reshetkaprav, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 19:
+                    user.screen.blit(self.portal, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+                elif self.map[j][i] == 20:
+                    user.screen.blit(self.strang1, (user.size[0] // 2 + i * 32 - MainHero.x,
+                                                  user.size[1] // 2 + j * 32 - MainHero.y))
+
 
     # функция проверки не вошёл ли объект (x, y (32x32px)) в текстуру
     def check(self, x, y: int, size=16):
@@ -309,7 +331,7 @@ if __name__ == '__main__':
         joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
     user = settings(autosize=True)
-    user.change_level('maps/level1')
+    user.change_level('maps/truelobby')
     # подгрузочка всякой всячены
     cursor = []
     cursori = pygame.image.load('data/cursor.png')

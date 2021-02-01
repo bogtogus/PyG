@@ -89,8 +89,8 @@ class Shark(Emeny):
 
 
 class Slime(Emeny):
-    image = pygame.image.load('data/slime.png')
-    image2 = pygame.image.load('data/slime2.png')
+    image = pygame.image.load('data/elf.png')
+    image2 = pygame.image.load('data/elf2.png')
 
     def __init__(self, x, y: int, size: list, *group):
         super().__init__(x, y, *group)
