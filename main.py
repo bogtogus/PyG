@@ -80,8 +80,8 @@ class settings:
             MainHero.x = int(data2[0].split()[0])
             MainHero.y = int(data2[0].split()[1])
             self.floor = [int(i) for i in data2[1].split(' ')]
-            pygame.mixer.music.load('music/' + data2[2])
-            pygame.mixer.music.play(-1)
+            #pygame.mixer.music.load('music/' + data2[2])
+            #pygame.mixer.music.play(-1)
             self.next = data2[3]
             for i in data2[4:]:
                 if i.split()[0] == 'Bar':
@@ -340,7 +340,7 @@ if __name__ == '__main__':
 
     pygame.mouse.set_visible(False)
     run_image = pygame.image.load('data/main_run.png')
-    user.screen = pygame.display.set_mode(user.size, pygame.FULLSCREEN)
+    user.screen = pygame.display.set_mode(user.size)
     font = pygame.font.Font(None, 30)
     MainLoop = True
     clock = pygame.time.Clock()
