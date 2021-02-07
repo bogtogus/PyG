@@ -1,7 +1,5 @@
 from math import cos, sin, pi
 
-
-
 import datetime
 import pygame
 import time
@@ -10,6 +8,8 @@ from libs import emeny
 from libs import barman
 from libs import invertory
 from libs import items
+from libs import shop
+from random import randint
 
 t1 = datetime.datetime.now()
 
@@ -54,6 +54,7 @@ def hud():
     user.screen.fill((0, 0, 0))
     user.level.draw()
     user.AS.draw(user.screen)
+    user.screen.blit(font.render('$' + str(MainHero.gold), True, (0, 128, 0)), (user.size[0] - 96, 96))
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 64, 0, 32, 96), width=1)
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 96, 32, 96, 32), width=1)
 
@@ -238,6 +239,7 @@ class Hero:
         self.health = 1000
         self.back = invertory.inv()
         self.equip = [None for i in range(5)]
+        self.gold = 1000
 
     # функция отрисовки героя и его параметров(health, stamina, manna)
     def draw(self):
@@ -293,10 +295,13 @@ class Hero:
         pov = (pov + 50) // 90
         k = 0
         for i in range(len(user.S)):
+            if MainHero.equip[0] and MainHero.equip[0].accuracy * 100 < randint(0, 100):
+                continue
             if pov == 0 and MainHero.y - 32 <= user.S[i - k].y <= MainHero.y and MainHero.x - 16 <= \
                     user.S[i - k].x <= MainHero.x + 16:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
+                    MainHero.gold += randint(10, 100)
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
@@ -304,6 +309,7 @@ class Hero:
                     user.S[i - k].x < MainHero.x:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
+                    MainHero.gold += randint(10, 100)
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
@@ -311,6 +317,7 @@ class Hero:
                     user.S[i - k].x < MainHero.x - 16:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
+                    MainHero.gold += randint(10, 100)
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
@@ -318,6 +325,7 @@ class Hero:
                     user.S[i - k].x < MainHero.x:
                 user.S[i - k].health -= (self.equip[0].damage if self.equip[0] else 1)
                 if user.S[i - k].health < 1:
+                    MainHero.gold += randint(10, 100)
                     user.AS.remove(user.S[i - k])
                     del user.S[i - k]
                     k += 1
@@ -477,10 +485,19 @@ if __name__ == '__main__':
                 ret = invertory.draw(user.screen, MainHero.back, cursor[0], cursor[1])
                 if ret != -1:
                     if ret[1] == 1:
-                        if type(MainHero.back[ret[0] - 1]) == items.Weapon:
+                        if isinstance(MainHero.back[ret[0] - 1], items.Weapon):
                             MainHero.equip[0] = MainHero.back[ret[0] - 1]
-                        elif type(MainHero.back[ret[0] - 1]) == items.Armor:
+                        elif isinstance(MainHero.back[ret[0] - 1], items.Armor):
                             MainHero.equip[1] = MainHero.back[ret[0] - 1]
+
+            if pygame.K_t in user.KeyPressed:
+                user.KeyPressed = []
+                hud()
+                MainHero.draw()
+                flip()
+                money = [MainHero.gold]
+                shop.shoplist(money, MainHero.back)
+                MainHero.gold = money[0]
 
         # отрисовка всякой всячены(иницализированой в одном из прошлых комментариев)
         hud()
