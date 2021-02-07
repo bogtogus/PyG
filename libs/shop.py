@@ -4,7 +4,7 @@ from libs.items import *
 
 def shoplist(money: list, invr: inv):
     forsale = inv()
-    forsale.extend((Weapon(1000, 0.1), Armor(1000, 0.1), WoodenStick()))
+    forsale.extend((WoodenStick(), IronSword(), RicardoArmor()))
     r = draw(pygame.display.get_surface(), forsale, pygame.display.get_surface().get_size()[0] // 2,
         pygame.display.get_surface().get_size()[1] // 2)
     if r != -1 and r[1] == 1:

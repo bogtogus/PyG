@@ -68,7 +68,7 @@ class Bar(Friend):
         self.rect = self.image.get_rect()
         self.rect.x = size[0] // 2 + self.x - x
         self.rect.y = size[1] // 2 + self.y - y
-        self.maxhp = 2
+        self.maxhp = 10000000
         self.health = self.maxhp
         self.func = 0
 
@@ -83,15 +83,3 @@ class Bar(Friend):
             elif self.y + 16 > y and check(self.x + 16, self.y + 15):
                 self.y -= 1
         super().update(x, y, size, Bar.image, Bar.image2)
-        if (self.x - 16 < x < self.x + 48) and (self.y - 16 < y < self.y + 48):
-            health[0] -= 5
-
-
-    def draw(self):
-        self.func()
-        super().super().draw()
-
-
-
-
-

@@ -39,3 +39,36 @@ class WoodenStick(Weapon):
 
     def draw(self, SCREEN: pygame.surface, x, y: int):
         super().draw(SCREEN, x, y, WoodenStick.__image)
+
+class IronSword(Weapon):
+    __image = pygame.image.load('data/ironsword.png')
+    def __init__(self):
+        super().__init__(10, 0.3)
+
+    def DrawEquip(self, SCREEN: pygame.surface, size: list):
+        super().DrawEquip(SCREEN, size, IronSword.__image)
+
+    def draw(self, SCREEN: pygame.surface, x, y: int):
+        super().draw(SCREEN, x, y, IronSword.__image)
+
+class IronSword(Weapon):
+    __image = pygame.image.load('data/ironsword.png')
+    def __init__(self):
+        super().__init__(10, 0.3)
+
+    def DrawEquip(self, SCREEN: pygame.surface, size: list):
+        super().DrawEquip(SCREEN, size, IronSword.__image)
+
+    def draw(self, SCREEN: pygame.surface, x, y: int):
+        super().draw(SCREEN, x, y, IronSword.__image)
+
+class RicardoArmor(Armor):
+    __image = pygame.image.load('data/ricardos.png')
+    def __init__(self):
+        super().__init__(1000, 0.9)
+
+    def DrawEquip(self, SCREEN: pygame.surface, size: list):
+        super().DrawEquip(SCREEN, size, RicardoArmor.__image)
+
+    def draw(self, SCREEN: pygame.surface, x, y: int):
+        super().draw(SCREEN, x, y, RicardoArmor.__image)

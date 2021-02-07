@@ -10,6 +10,7 @@ from libs import invertory
 from libs import items
 from libs import shop
 from random import randint
+from libs.start import init
 
 t1 = datetime.datetime.now()
 
@@ -52,8 +53,16 @@ def flip():
 # отрисовка кода
 def hud():
     user.screen.fill((0, 0, 0))
-    user.level.draw()
+    if len(user.level.map) == 24:
+        user.screen.blit(roof, (user.size[0] // 2 - MainHero.x + 32, user.size[1] // 2 - MainHero.y + 32))
+        user.screen.blit(ggggg, (user.size[0] // 2 - MainHero.x + 832, user.size[1] // 2 - MainHero.y + 256))
+    else:
+        user.level.draw()
     user.AS.draw(user.screen)
+    if len(user.level.map) == 24:
+        color = randint(0, 128)
+        pygame.draw.line(user.screen, (color, color, 255), (user.size[0] // 2, user.size[1] // 2),
+                         (user.size[0] // 2 - MainHero.x + 86 + 832, user.size[1] // 2 - MainHero.y + 256 + 45), width=randint(1, 4))
     user.screen.blit(font.render('$' + str(MainHero.gold), True, (0, 128, 0)), (user.size[0] - 96, 96))
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 64, 0, 32, 96), width=1)
     pygame.draw.rect(user.screen, 'white', (user.size[0] - 96, 32, 96, 32), width=1)
@@ -81,8 +90,8 @@ class settings:
             MainHero.x = int(data2[0].split()[0])
             MainHero.y = int(data2[0].split()[1])
             self.floor = [int(i) for i in data2[1].split(' ')]
-            #pygame.mixer.music.load('music/' + data2[2])
-            #pygame.mixer.music.play(-1)
+            pygame.mixer.music.load('music/' + data2[2])
+            pygame.mixer.music.play(-1)
             self.next = data2[3]
             for i in data2[4:]:
                 if i.split()[0] == 'Bar':
@@ -95,6 +104,8 @@ class settings:
                     self.S.append(emeny.Shark(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
                 if i.split()[0] == 'Boss':
                     self.S.append(emeny.Boss(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
+                if i.split()[0] == 'P':
+                    self.S.append(emeny.Prism(int(i.split()[1]), int(i.split()[2]), self.size, self.AS))
 
     def add(self, sth, todo=0):
         if todo == 0:
@@ -335,6 +346,7 @@ if __name__ == '__main__':
 
     pygame.init()
     pygame.joystick.init()
+
     if pygame.joystick.get_count() > 0:
         joy = pygame.joystick.Joystick(0)
     MainHero = Hero()
@@ -345,14 +357,15 @@ if __name__ == '__main__':
     cursori = pygame.image.load('data/cursor.png')
 
     pygame.display.set_caption('PyG')
-
+    roof = pygame.image.load('data/roof.png')
+    ggggg = pygame.image.load('data/5g.png')
     pygame.mouse.set_visible(False)
     run_image = pygame.image.load('data/main_run.png')
     user.screen = pygame.display.set_mode(user.size)
     font = pygame.font.Font(None, 30)
     MainLoop = True
     clock = pygame.time.Clock()
-
+    init()
     MainHero.image.convert_alpha()
     MainHero.back.append(items.Weapon(20, 0.5))
     MainHero.back.append(items.Armor(20, 0.1))
